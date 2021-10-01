@@ -4,7 +4,33 @@
 
 #default IP and PORT
 import socket
+import threading
+
 import requests
+
+class Proxy(threading.Thread):
+    def __init__(self, conn, address):
+        threading.Thread.__init__(self)
+        self.Proxy_client_conn = conn
+        self.address = address
+    def run(self):
+        data = self.Proxy_client_conn.recv(bufferSize)
+        data_decode = data.decode().split('\r\n')
+        # proxy to web
+        web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        webserver = data_decode[1].split(' ')[1]
+        web.connect((webserver, 80))
+        web.send(data)
+        while 1:
+            web.settimeout(2)
+            try:
+                web_reponse = web.recv(bufferSize)
+            except socket.error:
+                break
+
+            if (len(web_reponse) > 0):
+                self.Proxy_client_conn.send(web_reponse)
 
 IP = '127.0.0.1'
 PORT = 8080
@@ -24,32 +50,9 @@ def proxy():
         # client to proxy
         Proxy_client_conn, addr = ProxySocket.accept()
         print('Received a connection from:', addr)
-        # Proxy the request from the clinet
-        # Fill in start.
-        data = Proxy_client_conn.recv(bufferSize)
-        data_decode = data.decode().split('\r\n')
-        #proxy to web
-        web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        webserver = data_decode[1].split(' ')[1]
-        web.connect((webserver, 80))
-        web.send(data)
-        while 1:
-            web.settimeout(2)
-            try:
-                web_reponse = web.recv(bufferSize)
-            except socket.error:
-                break
-
-            if (len(web_reponse) > 0):
-                Proxy_client_conn.send(web_reponse)
-        Proxy_client_conn.close()
-        web.close()
-
-        # Fill in end.
+        Proxy(Proxy_client_conn, addr)
 
 
-# Fill in start.
 
 
 if __name__ == "__main__":
