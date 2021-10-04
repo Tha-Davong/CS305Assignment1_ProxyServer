@@ -19,9 +19,10 @@ class Proxy(threading.Thread):
     def run(self):
         data = self.Proxy_client_conn.recv(bufferSize)
         data_decode = data.decode().split('\r\n')
+        #Check in caches
+
         # proxy to web
         web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
         webserver = data_decode[1].split(' ')[1]
         web.connect((webserver, 80))
         web.send(data)
