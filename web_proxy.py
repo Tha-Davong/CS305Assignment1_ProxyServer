@@ -5,6 +5,7 @@
 # default IP and PORT
 import socket
 import threading
+import time
 
 import requests
 
@@ -33,7 +34,6 @@ class Proxy(threading.Thread):
 
             if (len(web_reponse) > 0):
                 self.Proxy_client_conn.send(web_reponse)
-
 
 IP = '127.0.0.1'
 PORT = 8080
