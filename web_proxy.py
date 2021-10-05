@@ -52,24 +52,6 @@ class Proxy(threading.Thread):
         # self.Proxy_client_conn.send('Read From Cache'.encode())
         # self.Proxy_client_conn.close()
 
-    def GetContentFromServerNoCaching(self, data, data_decode):
-        web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        webserver = data_decode[1].split(' ')[1]
-        web.connect((webserver, 80))
-        web.send(data)
-        while 1:
-            web.settimeout(2)
-            try:
-                web_reponse = web.recv(bufferSize)
-                print('get Content from web')
-                web_response_decode = web_reponse.decode()
-
-            except socket.error:
-                break
-
-            if (len(web_reponse) > 0):
-                self.Proxy_client_conn.send(web_reponse)
-
     def GetContentFromServer(self, data, data_decode, filename, cacheFolder):
         # proxy to web
         web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
